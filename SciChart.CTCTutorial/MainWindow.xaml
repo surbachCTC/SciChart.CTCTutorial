@@ -7,7 +7,14 @@
         xmlns:s="http://schemas.abtsoftware.co.uk/scichart"
         mc:Ignorable="d"
         Title="MainWindow" Height="550" Width="800">
-    <Grid>
+    <Grid Background="#222">
+        <!-- Add some RowDefinitions -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        
         <s:SciChartSurface x:Name="sciChartSurface">
 
             <s:SciChartSurface.RenderableSeries>
@@ -49,5 +56,9 @@
                 <s:TextAnnotation Text="Hello world!" X1="5.0" Y1="5"/>
             </s:SciChartSurface.Annotations>
         </s:SciChartSurface>
+
+        <!-- Add a Scrollbar, and bind to SciChartSurface.XAxis -->
+        <s:SciChartScrollbar Grid.Row="1" Axis="{Binding ElementName=sciChartSurface, Path=XAxis}"/>
+        
     </Grid>
 </Window>
