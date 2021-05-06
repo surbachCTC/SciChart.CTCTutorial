@@ -11,14 +11,18 @@
         <local:MainViewModel x:Key="MainViewModel"/>
     </Window.Resources>
     <Grid DataContext="{StaticResource MainViewModel}">
-        <!-- Bind to ChartViewModel.ChartTitle etc -->
-        <s:SciChartSurface ChartTitle="{Binding ChartTitle}">
+        <!-- Bind to ChartViewModel.RenderableSeries collection using SeriesBinding -->
+        <s:SciChartSurface RenderableSeries="{s:SeriesBinding RenderableSeries}" 
+                           ChartTitle="{Binding ChartTitle}">
             <s:SciChartSurface.XAxis>
                 <s:NumericAxis AxisTitle="{Binding XAxisTitle}"/>
             </s:SciChartSurface.XAxis>
             <s:SciChartSurface.YAxis>
                 <s:NumericAxis AxisTitle="{Binding YAxisTitle}"/>
             </s:SciChartSurface.YAxis>
+
+            
+            
         </s:SciChartSurface>
     </Grid>
 </Window>
