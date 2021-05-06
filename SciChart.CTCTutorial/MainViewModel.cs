@@ -27,6 +27,7 @@ namespace SciChart.CTCTutorial
                 StrokeThickness = 2,
                 Stroke = Colors.SteelBlue,
                 DataSeries = lineData,
+                StyleKey = "LineSeriesStyle"
             });
         }
         public ObservableCollection<IRenderableSeriesViewModel> RenderableSeries
