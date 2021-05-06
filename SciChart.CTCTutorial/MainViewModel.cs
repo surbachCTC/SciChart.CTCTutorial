@@ -14,6 +14,30 @@ namespace SciChart.CTCTutorial
         private string _xAxisTitle = "XAxis";
         private string _yAxisTitle = "YAxis";
 
+        private ObservableCollection<IRenderableSeriesViewModel> _renderableSeries;
+        public MainViewModel()
+        {
+            var lineData = new XyDataSeries<double, double>() { SeriesName = "TestingSeries" };
+            lineData.Append(0, 0);
+            lineData.Append(1, 1);
+            lineData.Append(2, 2);
+            _renderableSeries = new ObservableCollection<IRenderableSeriesViewModel>();
+            RenderableSeries.Add(new LineRenderableSeriesViewModel()
+            {
+                StrokeThickness = 2,
+                Stroke = Colors.SteelBlue,
+                DataSeries = lineData,
+            });
+        }
+        public ObservableCollection<IRenderableSeriesViewModel> RenderableSeries
+        {
+            get { return _renderableSeries; }
+            set
+            {
+                _renderableSeries = value;
+                OnPropertyChanged("RenderableSeries");
+            }
+        }
         public string ChartTitle
         {
             get { return _chartTitle; }
@@ -42,6 +66,7 @@ namespace SciChart.CTCTutorial
             }
         }
     }
+
 }
 
 
