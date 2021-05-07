@@ -25,13 +25,13 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="s:TooltipControl">
                             <Border Background="#ff6495ed"
-                            BorderBrush="#ff87B1FA"
-                            BorderThickness="2"
-                            CornerRadius="5"
-                            Opacity="0.9"
-                            Padding="5">
+                                BorderBrush="#ff87B1FA"
+                                BorderThickness="2"
+                                CornerRadius="5"
+                                Opacity="0.9"
+                                Padding="5">
                                 <ContentPresenter Content="{TemplateBinding DataContext}"
-                                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>
@@ -43,16 +43,16 @@
             <DataTemplate x:Key="TooltipTemplate" DataType="s:XySeriesInfo">
                 <StackPanel Orientation="Vertical">
                     <TextBlock Foreground="White">
-                <Run Text="Series: "/>
-                <Run Text="{Binding SeriesName, StringFormat='{}{0}:'}"/>
+                    <Run Text="Series: "/>
+                    <Run Text="{Binding SeriesName, StringFormat='{}{0}:'}"/>
                     </TextBlock>
                     <TextBlock Foreground="White">
-                <Run Text="X-Value: "/>
-                <Run Text="{Binding FormattedXValue, Mode=OneWay}"/>
+                    <Run Text="X-Value: "/>
+                    <Run Text="{Binding FormattedXValue, Mode=OneWay}"/>
                     </TextBlock>
                     <TextBlock Foreground="White">
-                <Run Text="Y-Value: "/>
-                <Run Text="{Binding FormattedYValue, Mode=OneWay}"/>
+                    <Run Text="Y-Value: "/>
+                    <Run Text="{Binding FormattedYValue, Mode=OneWay}"/>
                     </TextBlock>
                 </StackPanel>
             </DataTemplate>
@@ -63,54 +63,52 @@
                 <Setter Property="s:RolloverModifier.IncludeSeries" Value="True"/>
                 <Setter Property="StrokeThickness" Value="2"/>
             </Style>
-
-            <!-- Style applied to InfoAnnotation ensures default properties are bound -->
-            <Style TargetType="local:InfoAnnotation" BasedOn="{StaticResource MvvmCustomAnnotationStyle}"/>
+            <Style TargetType="local:InfoAnnotation" BasedOn="{StaticResource MvvmBaseAnnotationStyle}"/>
         </ResourceDictionary>
-        
     </Window.Resources>
-
     <Grid DataContext="{StaticResource MainViewModel}">
 
-        <!-- New code here. Add RowDefinitions -->
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- New code here: Add controls to toggle between zoom and pan -->
         <StackPanel Orientation="Horizontal" Background="#333">
             <CheckBox Margin="5" Foreground="#FFF" Content="Enable Zoom?" IsChecked="{Binding EnableZoom, Mode=TwoWay}"/>
             <CheckBox Margin="5" Foreground="#FFF" Content="Enable Pan?" IsChecked="{Binding EnablePan, Mode=TwoWay}" />
         </StackPanel>
+        <!-- New code here. Add ItemsControl bound to ChartPanes -->
+        <ItemsControl ItemsSource="{Binding ChartPanes}" Grid.Row="1">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="2">
+                    </UniformGrid>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <!-- Don't forget to add Grid.Row=1 -->
+                    <s:SciChartSurface
+                                       RenderableSeries="{s:SeriesBinding RenderableSeries}" 
+                                       Annotations="{s:AnnotationsBinding Annotations}"
+                                       YAxes="{s:AxesBinding YAxes}"
+                                       XAxes="{s:AxesBinding XAxes}"
+                                       ChartTitle="{Binding ChartTitle}">
+                        <s:SciChartSurface.ChartModifier>
 
-        <!-- Don't forget to add Grid.Row=1 -->
-        <!-- Add a new line for XAxes and YAxes binding to collections in the ViewModel -->
-        <s:SciChartSurface Grid.Row="1"
-                    RenderableSeries="{s:SeriesBinding RenderableSeries}" 
-                    Annotations="{s:AnnotationsBinding Annotations}"
-                    YAxes="{s:AxesBinding YAxes}"
-                    XAxes="{s:AxesBinding XAxes}"
-                    ChartTitle="{Binding ChartTitle}">
+                            <!-- Bind ModifierGroup using MouseManager.MouseEventGroup attached property -->
+                            <s:ModifierGroup s:MouseManager.MouseEventGroup="{Binding MouseEventGroup}">
 
-            <!-- Don't forget to remove the XAxis and YAxis we defined in XAML! -->
-
-            <!-- Inside your SciChartSurface.ChartModifier group -->
-            <s:SciChartSurface.ChartModifier>
-                <!-- Ensure ModifierGroup DataContext is the MainViewModel (not the ChartViewModel)-->
-                <s:ModifierGroup>
-                    <s:RubberBandXyZoomModifier IsEnabled="{Binding EnableZoom}" />
-                    <s:ZoomPanModifier IsEnabled="{Binding EnablePan}" ClipModeX="None" />
-                    <s:ZoomExtentsModifier/>
-
-                    <!-- NEW CODE HERE: Add the LegendModifier and RolloverModifier -->
-                    <s:LegendModifier ShowLegend="True" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center"/>
-                    <s:RolloverModifier ShowTooltipOn="MouseHover"/>
-                    <!-- END NEW CODE -->
-                </s:ModifierGroup>
-            </s:SciChartSurface.ChartModifier>
-
-        </s:SciChartSurface>
+                                <s:RubberBandXyZoomModifier IsEnabled="{Binding Path=DataContext.EnableZoom, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}" />
+                                <s:ZoomPanModifier IsEnabled="{Binding Path=DataContext.EnablePan, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}" ClipModeX="None" />
+                                <s:ZoomExtentsModifier/>
+                                <s:LegendModifier ShowLegend="True" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+                                <s:RolloverModifier ShowTooltipOn="MouseHover"/>
+                            </s:ModifierGroup>
+                        </s:SciChartSurface.ChartModifier>
+                    </s:SciChartSurface>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
-    
 </Window>
