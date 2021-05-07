@@ -67,6 +67,7 @@
     <Compile Include="InfoAnnotation.xaml.cs">
       <DependentUpon>InfoAnnotation.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InfoAnnotationViewModel.cs" />
     <Compile Include="MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Media;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
@@ -13,46 +14,67 @@ namespace SciChart.CTCTutorial
         private string _chartTitle = "Hello SciChart World!";
         private string _xAxisTitle = "XAxis";
         private string _yAxisTitle = "YAxis";
-
-        private ObservableCollection<IRenderableSeriesViewModel> _renderableSeries;
+        private ObservableCollection<IRenderableSeriesViewModel> _renderableSeries = new ObservableCollection<IRenderableSeriesViewModel>();
+        private bool _enablePan;
+        private bool _enableZoom = true;
+        private XyDataSeries<double, double> _lineData;
+        private DummyDataProvider _dummyDataProvider = new DummyDataProvider();
+        private ObservableCollection<IAnnotationViewModel> _annotations = new ObservableCollection<IAnnotationViewModel>();
         public MainViewModel()
         {
-            //var lineData = new XyDataSeries<double, double>() { SeriesName = "TestingSeries" };
-            //lineData.Append(0, 0);
-            //lineData.Append(1, 1);
-            //lineData.Append(2, 2);
-            //_renderableSeries = new ObservableCollection<IRenderableSeriesViewModel>();
-            //RenderableSeries.Add(new LineRenderableSeriesViewModel()
-            //{
-            //    StrokeThickness = 2,
-            //    Stroke = Colors.SteelBlue,
-            //    DataSeries = lineData,
-            //    StyleKey = "LineSeriesStyle"
-            //});
+            CreateChartData();
+            CreateChartSeries();
 
-            var dummyDataProvider = new DummyDataProvider();
-            var lineData = new XyDataSeries<double, double>() { SeriesName = "TestingSeries" };
+            // Subscribe to future updates
+            int i = 0;
+            _dummyDataProvider.SubscribeUpdates((newValues) =>
+            {
+                // Append when new values arrive
+                _lineData.Append(newValues.XValues, newValues.YValues);
+                // Zoom the chart to fit
+                _lineData.InvalidateParentSurface(RangeMode.ZoomToFit);
+                // Every 100th datapoint, add an annotation
+                if (i % 100 == 0)
+                {
+                    Annotations.Add(new InfoAnnotationViewModel()
+                    {
+                        X1 = _lineData.XValues.Last(),
+                        Y1 = 0.0
+                    });
+                }
+                i++;
+            });
+        }
+        private void CreateChartData()
+        {
+            var initialDataValues = _dummyDataProvider.GetHistoricalData();
+            // Create a DataSeries. We later apply this to a RenderableSeries
+            _lineData = new XyDataSeries<double, double>() { SeriesName = "TestingSeries" };
+            // Append some data to the chart                                
+            _lineData.Append(initialDataValues.XValues, initialDataValues.YValues);
+
+        }
+        private void CreateChartSeries()
+        {
+            // Create a RenderableSeries. Apply the DataSeries created before
             _renderableSeries = new ObservableCollection<IRenderableSeriesViewModel>();
             RenderableSeries.Add(new LineRenderableSeriesViewModel()
             {
                 StrokeThickness = 2,
                 Stroke = Colors.SteelBlue,
-                DataSeries = lineData,
+                DataSeries = _lineData,
                 StyleKey = "LineSeriesStyle"
             });
-            // Append the initial values to the chart
-            var initialDataValues = dummyDataProvider.GetHistoricalData();
-            lineData.Append(initialDataValues.XValues, initialDataValues.YValues);
-            // Subscribe to future updates
-            dummyDataProvider.SubscribeUpdates((newValues) =>
-            {
-                // Append when new values arrive
-                lineData.Append(newValues.XValues, newValues.YValues);
-                // Zoom the chart to fit
-                lineData.InvalidateParentSurface(RangeMode.ZoomToFit);
-            });
         }
-
+        public ObservableCollection<IAnnotationViewModel> Annotations
+        {
+            get { return _annotations; }
+            set
+            {
+                _annotations = value;
+                OnPropertyChanged("Annotations");
+            }
+        }
         public ObservableCollection<IRenderableSeriesViewModel> RenderableSeries
         {
             get { return _renderableSeries; }
@@ -62,6 +84,9 @@ namespace SciChart.CTCTutorial
                 OnPropertyChanged("RenderableSeries");
             }
         }
+
+
+
         public string ChartTitle
         {
             get { return _chartTitle; }
@@ -90,7 +115,6 @@ namespace SciChart.CTCTutorial
             }
         }
 
-        private bool _enableZoom = true;
         public bool EnableZoom
         {
             get { return _enableZoom; }
@@ -104,7 +128,7 @@ namespace SciChart.CTCTutorial
                 }
             }
         }
-        private bool _enablePan;
+
         public bool EnablePan
         {
             get { return _enablePan; }

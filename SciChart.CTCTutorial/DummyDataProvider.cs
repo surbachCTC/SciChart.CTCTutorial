@@ -35,6 +35,7 @@ namespace SciChart.CTCTutorial
             // Don't do this in design mode! Or you will get an Out of memory exception in XAML Designer
             bool designMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
             if (designMode) return;
+
             // Subcribes to updates and pushes to viewmodels
             DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
             timer.Interval = TimeSpan.FromMilliseconds(20);
