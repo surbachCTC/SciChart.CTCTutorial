@@ -17,10 +17,21 @@ namespace SciChart.CTCTutorial
         private ObservableCollection<IRenderableSeriesViewModel> _renderableSeries;
         public MainViewModel()
         {
+            //var lineData = new XyDataSeries<double, double>() { SeriesName = "TestingSeries" };
+            //lineData.Append(0, 0);
+            //lineData.Append(1, 1);
+            //lineData.Append(2, 2);
+            //_renderableSeries = new ObservableCollection<IRenderableSeriesViewModel>();
+            //RenderableSeries.Add(new LineRenderableSeriesViewModel()
+            //{
+            //    StrokeThickness = 2,
+            //    Stroke = Colors.SteelBlue,
+            //    DataSeries = lineData,
+            //    StyleKey = "LineSeriesStyle"
+            //});
+
+            var dummyDataProvider = new DummyDataProvider();
             var lineData = new XyDataSeries<double, double>() { SeriesName = "TestingSeries" };
-            lineData.Append(0, 0);
-            lineData.Append(1, 1);
-            lineData.Append(2, 2);
             _renderableSeries = new ObservableCollection<IRenderableSeriesViewModel>();
             RenderableSeries.Add(new LineRenderableSeriesViewModel()
             {
@@ -29,7 +40,19 @@ namespace SciChart.CTCTutorial
                 DataSeries = lineData,
                 StyleKey = "LineSeriesStyle"
             });
+            // Append the initial values to the chart
+            var initialDataValues = dummyDataProvider.GetHistoricalData();
+            lineData.Append(initialDataValues.XValues, initialDataValues.YValues);
+            // Subscribe to future updates
+            dummyDataProvider.SubscribeUpdates((newValues) =>
+            {
+                // Append when new values arrive
+                lineData.Append(newValues.XValues, newValues.YValues);
+                // Zoom the chart to fit
+                lineData.InvalidateParentSurface(RangeMode.ZoomToFit);
+            });
         }
+
         public ObservableCollection<IRenderableSeriesViewModel> RenderableSeries
         {
             get { return _renderableSeries; }
