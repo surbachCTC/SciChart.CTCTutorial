@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Media;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
+using SciChart.Charting.Visuals.Axes;
 using SciChart.Data.Model;
 
 
@@ -20,10 +21,14 @@ namespace SciChart.CTCTutorial
         private XyDataSeries<double, double> _lineData;
         private DummyDataProvider _dummyDataProvider = new DummyDataProvider();
         private ObservableCollection<IAnnotationViewModel> _annotations = new ObservableCollection<IAnnotationViewModel>();
+
+        private ObservableCollection<IAxisViewModel> _yAxes = new ObservableCollection<IAxisViewModel>();
+        private ObservableCollection<IAxisViewModel> _xAxes = new ObservableCollection<IAxisViewModel>();
         public MainViewModel()
         {
             CreateChartData();
             CreateChartSeries();
+            CreateChartAxis();
 
             // Subscribe to future updates
             int i = 0;
@@ -36,15 +41,39 @@ namespace SciChart.CTCTutorial
                 // Every 100th datapoint, add an annotation
                 if (i % 100 == 0)
                 {
-                    Annotations.Add(new InfoAnnotationViewModel()
-                    {
-                        X1 = _lineData.XValues.Last(),
-                        Y1 = 0.0
-                    });
+                    Annotations.Add(new InfoAnnotationViewModel() { X1 = _lineData.XValues.Last(), Y1 = 0.0 });
                 }
                 i++;
             });
         }
+        private void CreateChartAxis()
+        {
+            YAxes.Add(new NumericAxisViewModel()
+            {
+                AutoRange = AutoRange.Always,
+                AxisTitle = "Left YAxis",
+                Id = "LeftYAxis",
+                AxisAlignment = AxisAlignment.Left,
+            });
+            YAxes.Add(new NumericAxisViewModel()
+            {
+                AutoRange = AutoRange.Always,
+                AxisTitle = "Right YAxis",
+                AxisAlignment = AxisAlignment.Right,
+            });
+            XAxes.Add(new NumericAxisViewModel()
+            {
+                AutoRange = AutoRange.Always,
+                AxisTitle = "XAxis",
+                AxisAlignment = AxisAlignment.Bottom,
+            });
+        }
+
+        public ObservableCollection<IAxisViewModel> YAxes { get { return _yAxes; } }
+
+        public ObservableCollection<IAxisViewModel> XAxes { get { return _xAxes; } }
+
+
         private void CreateChartData()
         {
             var initialDataValues = _dummyDataProvider.GetHistoricalData();

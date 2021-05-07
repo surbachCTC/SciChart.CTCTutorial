@@ -85,15 +85,15 @@
         </StackPanel>
 
         <!-- Don't forget to add Grid.Row=1 -->
+        <!-- Add a new line for XAxes and YAxes binding to collections in the ViewModel -->
         <s:SciChartSurface Grid.Row="1"
-                           RenderableSeries="{s:SeriesBinding RenderableSeries}"  
-                           ChartTitle="{Binding ChartTitle}">
-            <s:SciChartSurface.XAxis>
-                <s:NumericAxis AxisTitle="{Binding XAxisTitle}"/>
-            </s:SciChartSurface.XAxis>
-            <s:SciChartSurface.YAxis>
-                <s:NumericAxis AxisTitle="{Binding YAxisTitle}"/>
-            </s:SciChartSurface.YAxis>
+                    RenderableSeries="{s:SeriesBinding RenderableSeries}" 
+                    Annotations="{s:AnnotationsBinding Annotations}"
+                    YAxes="{s:AxesBinding YAxes}"
+                    XAxes="{s:AxesBinding XAxes}"
+                    ChartTitle="{Binding ChartTitle}">
+
+            <!-- Don't forget to remove the XAxis and YAxis we defined in XAML! -->
 
             <!-- Inside your SciChartSurface.ChartModifier group -->
             <s:SciChartSurface.ChartModifier>
